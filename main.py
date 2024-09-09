@@ -1,5 +1,8 @@
 import sys
-from PyQt6.QtWidgets import QApplication, QMainWindow, QTextEdit, QPushButton, QVBoxLayout, QWidget, QFileDialog, QLabel, QMessageBox
+from PyQt6.QtWidgets import (QApplication, QMainWindow, QTextEdit, QPushButton, QVBoxLayout,
+                             QWidget, QFileDialog, QLabel, QMessageBox, QTableWidget, QTableWidgetItem, QHeaderView)
+from PyQt6.QtGui import QFont
+from lexer import Lexer
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -15,14 +18,23 @@ class MainWindow(QMainWindow):
         
         self.open_button = QPushButton("Abrir Archivo", self)
         self.open_button.clicked.connect(self.open_file)
-        
-        self.result_label = QLabel(self)
+
+        self.table_widget = QTableWidget(self)
+        self.table_widget.setColumnCount(3)
+        self.table_widget.setHorizontalHeaderLabels(["TOKEN", "TIPO", "CANTIDAD"])
+
+        font = QFont()
+        font.setBold(True)
+        self.table_widget.horizontalHeader().setFont(font)
+
+        self.table_widget.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.table_widget.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
 
         layout = QVBoxLayout()
         layout.addWidget(self.open_button)
         layout.addWidget(self.text_edit)
         layout.addWidget(self.analyze_button)
-        layout.addWidget(self.result_label)
+        layout.addWidget(self.table_widget)
 
         container = QWidget()
         container.setLayout(layout)
@@ -50,10 +62,26 @@ class MainWindow(QMainWindow):
                 QMessageBox.warning(self, "Advertencia", "Primero debes cargar un archivo.")
                 return
 
-            # Aquí iría la lógica del lexer (esto se mantendría igual)
+            lexer = Lexer(content)
+            lexer.analyze()
+            tokens = lexer.get_tokens()
 
-            # Temporarily simulating result text (since Lexer isn't implemented in this snippet)
-            self.result_label.setText("Análisis completado con éxito.")
+            # Contar la cantidad de cada token
+            token_counts = {}
+            for token, tipo in tokens:
+                if token in token_counts:
+                    token_counts[token]['count'] += 1
+                else:
+                    token_counts[token] = {'type': tipo, 'count': 1}
+
+            self.table_widget.setRowCount(len(token_counts))
+
+            # Llenar la tabla con los tokens y sus tipos y cantidades
+            for row, (token, data) in enumerate(token_counts.items()):
+                self.table_widget.setItem(row, 0, QTableWidgetItem(token))
+                self.table_widget.setItem(row, 1, QTableWidgetItem(data['type']))
+                self.table_widget.setItem(row, 2, QTableWidgetItem(str(data['count'])))
+
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Error al analizar el archivo: {str(e)}")
 
@@ -62,3 +90,4 @@ if __name__ == '__main__':
     window = MainWindow()
     window.show()
     sys.exit(app.exec())
+
