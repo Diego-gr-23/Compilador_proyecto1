@@ -8,7 +8,8 @@ KEYWORDS = {
     "mientras": "Palabra Reservada",
     "hacer": "Palabra Reservada",
     "verdadero": "Palabra Reservada",
-    "falso": "Palabra Reservada"
+    "falso": "Palabra Reservada",
+    "Funcion": "Palabra Rervada"
 }
 
 OPERATORS = {
@@ -22,7 +23,9 @@ OPERATORS = {
     "<": "Operador",
     ">": "Operador",
     ">=": "Operador",
-    "<=": "Operador"
+    "<=": "Operador",
+    "'": "operador",
+    "'": "operador",
 }
 
 SYMBOLS = {
@@ -34,5 +37,5 @@ SYMBOLS = {
     ";": "Signo"
 }
 
-NUMERIC_PATTERN = r'\d+'  # Números (DD*)
-IDENTIFIER_PATTERN = r'[a-zA-Z_][a-zA-Z0-9_]*'  # Identificadores (L(D|L)*)
+NUMERIC_PATTERN = r'\d+(\.\d+)?'  # Soporte para números enteros y decimales
+IDENTIFIER_PATTERN = r'[a-zA-Z_][a-zA-Z0-9_]*'  # Identificadores

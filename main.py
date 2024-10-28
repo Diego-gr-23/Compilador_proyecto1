@@ -9,7 +9,7 @@ from analizador_semantico import SemanticAnalyzer
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Analizador Léxico, Sintáctico y Semántico")
+        self.setWindowTitle("Analizador de errores.")
         self.setGeometry(300, 300, 800, 600)
 
         self.text_edit = QTextEdit(self)
@@ -25,10 +25,9 @@ class MainWindow(QMainWindow):
         self.table_widget.setColumnCount(3)
         self.table_widget.setHorizontalHeaderLabels(["TOKEN", "TIPO", "CANTIDAD"])
 
-        # Sección de errores léxicos, sintácticos y semánticos
         self.lexical_errors_label = QLabel("Errores Léxicos:")
         self.syntax_errors_label = QLabel("Errores Sintácticos:")
-        self.semantic_errors_label = QLabel("Errores Semánticos:")
+        self.semantic_errors_label = QLabel("Errores Semánticos:")  
 
         self.lexical_errors = QTextEdit(self)
         self.lexical_errors.setReadOnly(True)
@@ -86,12 +85,15 @@ class MainWindow(QMainWindow):
             lexer = Lexer(content)
             lexer.analyze()
             tokens = lexer.get_tokens()
+            lexical_errors = lexer.get_errors()
 
             syntax_analyzer = SyntaxAnalyzer(tokens)
             syntax_analyzer.analyze()
-            
+            syntax_errors = syntax_analyzer.get_errors()
+
             semantic_analyzer = SemanticAnalyzer(tokens)
             semantic_analyzer.analyze()
+            semantic_errors = semantic_analyzer.get_errors()
 
             token_counts = {}
             for token, tipo in tokens:
@@ -106,10 +108,9 @@ class MainWindow(QMainWindow):
                 self.table_widget.setItem(row, 1, QTableWidgetItem(data['type']))
                 self.table_widget.setItem(row, 2, QTableWidgetItem(str(data['count'])))
 
-            # Mostrar errores léxicos, sintácticos y semánticos
-            self.lexical_errors.setPlainText("\n".join([f"Línea {line}: {word}" for line, word in lexer.get_errors()]))
-            self.syntax_errors.setPlainText("\n".join(syntax_analyzer.get_errors()))
-            self.semantic_errors.setPlainText("\n".join(semantic_analyzer.get_errors()))
+            self.lexical_errors.setPlainText("\n".join([f"Línea {line}: {word}" for line, word in lexical_errors]))
+            self.syntax_errors.setPlainText("\n".join(syntax_errors))
+            self.semantic_errors.setPlainText("\n".join(semantic_errors))
 
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Error al analizar el archivo: {str(e)}")
